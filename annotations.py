@@ -154,7 +154,8 @@ class AnnotationListener(sublime_plugin.EventListener):
 
 	def on_load(self, view):
 		# excludes .py for development
-		if not view.file_name().endswith(".py"):
+		file_name = view.file_name()
+		if not file_name.endswith(".py") and not file_name.endswith('sublime-keymap'):
 			view.set_read_only(True)
 		a = AnnotateCommand(view)
 		a.file_load_event()
