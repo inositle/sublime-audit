@@ -6,7 +6,8 @@ import os
 import json
 
 class SearchAnnotationsCommand(sublime_plugin.TextCommand):
-	def run(self, edit):
+	def run(self, edit, search):
+
 		folders = sublime.active_window().folders()
 		if len(folders) == 1:
 			proj_folder = folders[0]
@@ -23,7 +24,7 @@ class SearchAnnotationsCommand(sublime_plugin.TextCommand):
 
 		for ann_file in self.annotations['by_file']:
 			for region_start in self.annotations['by_file'][ann_file]:
-				text = self.annotations['by_file'][region_start]['text']
+				text = self.annotations['by_file'][ann_file][region_start]['text']
 				if search in text:
 					print("%s: %s" % (ann_file, text))
 				elif re.search(search, text):
