@@ -11,9 +11,9 @@ import threading
 
 annotation_thread = None
 
+
 class ListAnnotationsCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
-		print("running")
 		folders = sublime.active_window().folders()
 		if len(folders) == 1:
 			proj_folder = folders[0]
@@ -39,6 +39,7 @@ class ListAnnotationsCommand(sublime_plugin.TextCommand):
 			for region_start in file_index[ann_file]:
 				text =  file_index[ann_file][region_start]['text']
 				print("%s: %s" % (ann_file, text))
+
 
 class AnnotationThread(threading.Thread):
 

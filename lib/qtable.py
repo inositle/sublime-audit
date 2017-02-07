@@ -12,13 +12,11 @@ class AnnotationsTable(QTableWidget):
         self.file_name = file_name
         self.base_folder = base_folder
         self.data = {'File Name': [], "Location": [], "Annotation": []}
+        self.search = None
         self.update_data()
         self.horizontalHeader().setStretchLastSection(True)
-        self.setFixedSize(self.horizontalHeader().length() + 60, self.verticalHeader().length() + 100);
+        
         self.cellClicked.connect(self.click_event)
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_data)
-        self.timer.start(1000)
 
     def update_data(self):
         f = open(self.file_name)
@@ -32,9 +30,13 @@ class AnnotationsTable(QTableWidget):
                     file_label = file_label[1:]
                 if file_label.startswith("\\"):
                     file_label = file_label[1:]
-                self.data['File Name'].append(file_label)
-                self.data['Location'].append(location)
-                self.data['Annotation'].append(file_index[annotated_file][location]['text'])
+                annotation = file_index[annotated_file][location]['text']
+                if self.search is None or \
+                    (self.search and (self.search in file_label \
+                        or self.search in annotation)):
+                    self.data['File Name'].append(file_label)
+                    self.data['Location'].append(location)
+                    self.data['Annotation'].append(annotation)
         self.setRowCount(len(self.data['File Name']))
         self.setmydata()
         self.resizeColumnsToContents()
@@ -55,11 +57,38 @@ class AnnotationsTable(QTableWidget):
         path = os.path.join(self.base_folder, self.item(row, 0).text())
         print( path + "," + self.item(row, 1).text())
         sys.stdout.flush()
+
+    def handle_search(self, text):
+        if text == "":
+            self.search = None
+        else:
+            self.search = text
+        self.update_data()
+
  
 def main(args):
     app = QApplication(args)
+    main_window = QMainWindow()
+    main_widget = QWidget(main_window)
+    main_window.setCentralWidget(main_widget)
+    frame_layout = QVBoxLayout(main_widget)
     table = AnnotationsTable(sys.argv[1], sys.argv[2], 0, 3)
-    table.show()
+    frame_layout.addWidget(table)
+    horizontal_widget = QWidget()
+    horizontal_layout = QHBoxLayout()
+    search_bar = QLineEdit()
+    search_bar.textChanged.connect(table.handle_search)
+    search_label = QLabel("Search Annotations:")
+    refresh_button = QPushButton("Refresh Annotations")
+    refresh_button.clicked.connect(table.update_data)
+    horizontal_layout.addWidget(search_label)
+    horizontal_layout.addWidget(search_bar)
+    horizontal_layout.addWidget(refresh_button)
+    horizontal_widget.setLayout(horizontal_layout)
+    frame_layout.addWidget(horizontal_widget)
+    main_widget.setLayout(frame_layout)
+
+    main_window.show()
     sys.exit(app.exec_())
 
  
