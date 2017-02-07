@@ -1,6 +1,7 @@
 # sublime-audit
 
 ## Installation
+* install pyqt4
 * `cd C:\Users\”Username”\AppData\Roaming\Sublime Text 3\Packages`
 * `git clone https://github.com/jjmkk/sublime-audit.git`
 * In Sublime, make sure Package Control is enabled
