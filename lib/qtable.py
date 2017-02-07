@@ -39,6 +39,7 @@ class AnnotationsTable(QTableWidget):
         self.setmydata()
         self.resizeColumnsToContents()
         self.resizeRowsToContents()
+        self.horizontalHeader().setStretchLastSection(True)
 
     def setmydata(self):
  

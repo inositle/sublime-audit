@@ -114,13 +114,13 @@ class AnnotateCommand(sublime_plugin.TextCommand):
 	def add_all_phantoms(self):
 		if self.view.file_name() not in self.annotations['by_file']:
 			return
-
-		html = '<style>p{color: #f4dc42}</style><p align="left">%s</p>' % text
+		
 		file_name = self.view.file_name()
 		for loc in self.annotations['by_file'][file_name]:
 			int_loc = int(loc)
 			region = sublime.Region(int_loc, int_loc)
 			text = self.annotations['by_file'][file_name][loc]['text']
+			html = '<style>p{color: #f4dc42}</style><p align="left">%s</p>' % text
 			pid = mdpopups.add_phantom(self.view, "hi", region, html, 
 				                       layout=sublime.LAYOUT_BELOW)
 			self.annotations['by_file'][file_name][loc]['pid'] = pid
@@ -155,7 +155,7 @@ class AnnotationListener(sublime_plugin.EventListener):
 	def on_load(self, view):
 		# excludes .py for development
 		file_name = view.file_name()
-		if not file_name.endswith(".py") and not file_name.endswith('sublime-keymap'):
+		if not file_name.endswith(".py") and "sublime" not in file_name and "json" not in file_name:
 			view.set_read_only(True)
 		a = AnnotateCommand(view)
 		a.file_load_event()
