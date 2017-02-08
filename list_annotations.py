@@ -8,6 +8,7 @@ import json
 import subprocess
 import sys
 import threading
+import shlex
 
 annotation_thread = None
 
@@ -59,21 +60,23 @@ class AnnotationThread(threading.Thread):
 				self.annotations['by_tag'] = {}
 
 			binfile = os.path.join(sublime.packages_path(), "sublime-audit", "lib", "qtable.py")
-
-			args = [binfile  + " " + self.annotations_file + " " + folders[0] ]
-			print(args)
-			p = subprocess.Popen(args, stdout=subprocess.PIPE, shell=True)
-
+			args = ['pyw', binfile, self.annotations_file, folders[0]]
+			print('Launching Qt GUI sideapp: %s' % args)
+			p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			print('Started Qt GUI with PID=%d' % p.pid)
 			while p.poll() is None:
+				err = p.stderr.read()
+				if err:
+					print('ERR: %s' % err)
 				for lines in iter(p.stdout.readline, ""):
 					if p.poll() is not None:
 						break
-					print(lines)
+					#print(lines)
 					if lines:
 						lines = str(lines, 'utf-8')
 						for l in lines.split("/n"):
 							parts = str(l).split(",")
-							print(parts[0])
+							#print(parts[0])
 							if len(parts) == 2:
 								sublime.active_window().open_file(parts[0])
 								view = sublime.active_window().active_view()
